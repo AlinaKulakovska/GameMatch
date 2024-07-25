@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
+import { IoIosClose } from 'react-icons/io';
 
-const SignInForm = () => {
+const SignInForm = ({ isVisible, closeForm}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-
     const handleSubmit = (event) => {
         event.preventDefault();
         // Basic validation (you can replace this with more robust validation)
@@ -19,8 +19,9 @@ const SignInForm = () => {
     };
 
     return (
-        <div className='signinsection'>
+        <div className={`signinsection ${isVisible ? 'show' : ''}`}>
             <div className="sign-in-form">
+                <div className='close-icon' onClick={closeForm}><IoIosClose/></div>
                 <h2>Sign In</h2>
                 {error && <p className="error">{error}</p>}
                 <form onSubmit={handleSubmit}>
