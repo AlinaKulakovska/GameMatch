@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { IoIosClose } from 'react-icons/io';
-
+import { Link } from 'react-router-dom'
 const SignInForm = ({ isVisible, closeForm}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -45,7 +45,7 @@ const SignInForm = ({ isVisible, closeForm}) => {
                             required
                         />
                     </div>
-                    <button type="submit">Sign In</button>
+                    <Link to='/profile' className='flex items-center link'><button type="submit">Sign In</button></Link>
                 </form>
             </div></div>
     );

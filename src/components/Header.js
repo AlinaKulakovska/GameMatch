@@ -1,7 +1,7 @@
-import { FaCog, FaEnvelope, FaHome, FaInfo } from 'react-icons/fa';
+import {FaHome, FaUser } from 'react-icons/fa';
 import logo from '../images/logo.png'
 import { useState } from 'react';
-
+import { Link } from 'react-router-dom'
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -15,11 +15,9 @@ function Header() {
         <h1 className="site-name">GameMatch</h1>
       </div>
       <nav className={`nav ${isMobileMenuOpen ? 'open' : ''}`}>
-      <ul className="nav-links ">
-          <li><a href="#home" ><FaHome  className='mr-2 -mt-1'/> Home</a></li>
-          <li><a href="#about"><FaInfo className='mr-2 -mt-1'/> About</a></li>
-          <li><a href="#services"><FaCog className='mr-2 -mt-1'/> Services</a></li>
-          <li><a href="#contact"><FaEnvelope className='mr-2 -mt-1'/> Contact</a></li>
+        <ul className="nav-links ">
+          <Link to='/' className='flex items-center link'><FaHome className='-mt-1 mr-2' />Home</Link>
+          <Link to='/profile' className='flex items-center link'><FaUser className='-mt-1 mr-2' /> Profile</Link>
         </ul>
       </nav>
       <button className="mobile-menu-button" onClick={toggleMobileMenu}>

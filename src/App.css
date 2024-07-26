@@ -7,7 +7,6 @@ body{
     font-family: "Josefin Sans", sans-serif;
 }
 
-
 .header {
   display: flex;
   justify-content: space-between;
@@ -46,7 +45,7 @@ body{
   gap: 20px;
 }
 
-.nav-links a {
+.link {
   color: white;
   text-decoration: none;
   font-size: 1rem;
@@ -55,7 +54,7 @@ body{
   transition: color 0.3s ease-in-out;
 }
 
-.nav-links a:hover {
+.link:hover {
   color: #ffd700;
 }
 
@@ -384,5 +383,90 @@ margin-left: -1px;
   .label {
     font-size: 1.2rem;
     color: #555;
+  }
+
+
+
+  .profile-page {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .profile-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .edit-button, .save-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #ff4081;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .edit-button:hover, .save-button:hover {
+    background-color: #e73370;
+  }
+  
+  .profile-form label {
+    display: block;
+    margin: 10px 0;
+    text-align: left;
+  }
+  
+  .profile-form input, .profile-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .profile-info h2 {
+    margin: 20px 0;
+  }
+  
+  .profile-info p {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  .profile-info h3 {
+    margin: 20px 0 10px;
+  }
+  
+  .profile-info ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .profile-info ul li {
+    background: #ff7e5f;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: inline-block;
+    margin: 5px;
+  }
+  
+  .basic-multi-select {
+    width: 100%;
+    margin-top: 5px;
   }
   
