@@ -1,7 +1,8 @@
-import {FaHome, FaUser } from 'react-icons/fa';
+import {FaEnvelopeOpenText, FaHome, FaUser } from 'react-icons/fa';
 import logo from '../images/logo.png'
 import { useState } from 'react';
 import { Link } from 'react-router-dom'
+import { FaHeartCirclePlus } from 'react-icons/fa6';
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -18,6 +19,8 @@ function Header() {
         <ul className="nav-links ">
           <Link to='/' className='flex items-center link'><FaHome className='-mt-1 mr-2' />Home</Link>
           <Link to='/profile' className='flex items-center link'><FaUser className='-mt-1 mr-2' /> Profile</Link>
+          <Link to='/profiles' className='flex items-center link'><FaHeartCirclePlus className='-mt-1 mr-2' /> Swipe</Link>
+          <Link to='/matches' className='flex items-center link'><FaEnvelopeOpenText className='-mt-1 mr-2' /> Matches</Link>
         </ul>
       </nav>
       <button className="mobile-menu-button" onClick={toggleMobileMenu}>
