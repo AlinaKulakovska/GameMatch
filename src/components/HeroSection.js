@@ -5,7 +5,7 @@ const HeroSection = () => {
   const [isSignInFormVisible, setIsSignInFormVisible] = useState(false);
 
   const toggleSignInForm = () => {
-    setIsSignInFormVisible(!isSignInFormVisible);
+    setIsSignInFormVisible(true);
   };
   const closeSignInForm = () => {
     setIsSignInFormVisible(false);

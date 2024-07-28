@@ -1,30 +1,49 @@
 import React, { useState } from 'react';
 import { IoIosClose } from 'react-icons/io';
 import { Link } from 'react-router-dom'
-const SignInForm = ({ isVisible, closeForm}) => {
+
+import { auth } from './firebaseConfig';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+
+const SignInForm = ({ isVisible, closeForm }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        // Basic validation (you can replace this with more robust validation)
-        if (!email || !password) {
-            setError('Please fill in all fields');
-        } else {
-            setError('');
-            // Handle form submission (e.g., send data to server)
-            console.log('Email:', email);
-            console.log('Password:', password);
-        }
+
+    const handleRegister = () => {
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Signed up 
+                    const user = userCredential.user;
+                    closeForm()
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    console.log(errorCode)
+                    // ..
+                });
+        } 
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed in 
+                const user = userCredential.user;
+                closeForm()
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                console.log(errorCode)
+            })
     };
 
     return (
         <div className={`signinsection ${isVisible ? 'show' : ''}`}>
             <div className="sign-in-form">
-                <div className='close-icon' onClick={closeForm}><IoIosClose/></div>
+                <div className='close-icon' onClick={closeForm}><IoIosClose /></div>
                 <h2>Sign In</h2>
                 {error && <p className="error">{error}</p>}
-                <form onSubmit={handleSubmit}>
+                <form>
                     <div className="form-group">
                         <label htmlFor="email">Email:</label>
                         <input
@@ -45,7 +64,8 @@ const SignInForm = ({ isVisible, closeForm}) => {
                             required
                         />
                     </div>
-                    <Link to='/profile' className='flex items-center link'><button type="submit">Sign In</button></Link>
+                    <button type="submit" onClick={handleRegister}>Register</button>
+                    <button type="submit" className='mt-5' onClick={handleLogin}>Sign In</button>
                 </form>
             </div></div>
     );

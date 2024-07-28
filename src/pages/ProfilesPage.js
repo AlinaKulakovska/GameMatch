@@ -64,16 +64,17 @@ const ProfilesPage = () => {
         setFilteredProfiles(filtered);
         setCurrentIndex(0);
     };
-
+// dislike
     const handleNextProfile = () => {
         if (currentIndex < filteredProfiles.length - 1) {
             setCurrentIndex(currentIndex + 1);
         }
     };
-
+// like
     const handlePrevProfile = () => {
-        if (currentIndex > 0) {
-            setCurrentIndex(currentIndex - 1);
+        if (currentIndex < filteredProfiles.length - 1) {
+            setCurrentIndex(currentIndex + 1);
+// add to likes database
         }
     };
 
@@ -133,10 +134,9 @@ const ProfilesPage = () => {
                     </ul>
                     <h6 className='mb-2 flex justify-center items-center'><FaMapLocationDot className='mr-2' /> {currentProfile.location}</h6>
                     <div className="buttons">
-                        <button onClick={handlePrevProfile} disabled={currentIndex === 0} className="like-button">Previous</button>
-                        <button onClick={handleNextProfile} disabled={currentIndex === filteredProfiles.length - 1} className="dislike-button">Next</button>
+                        <button onClick={handleNextProfile} disabled={currentIndex === filteredProfiles.length - 1} className="dislike-button">Dislike</button>
+                        <button onClick={handlePrevProfile} disabled={currentIndex === filteredProfiles.length - 1} className="like-button">Like</button>
                     </div>
-
                 </div>
             ) : (
                 <p>No profiles match the filters</p>

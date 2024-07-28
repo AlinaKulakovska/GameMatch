@@ -1,14 +1,40 @@
-import {FaEnvelopeOpenText, FaHome, FaUser } from 'react-icons/fa';
+import { FaEnvelopeOpenText, FaHome, FaUser } from 'react-icons/fa';
 import logo from '../images/logo.png'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import { FaHeartCirclePlus } from 'react-icons/fa6';
+
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebaseConfig';
+import { signOut } from 'firebase/auth';
+
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      console.log("User signed out");
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+
   return (
     <header className="header">
       <div className="logo-container">
@@ -21,6 +47,7 @@ function Header() {
           <Link to='/profile' className='flex items-center link'><FaUser className='-mt-1 mr-2' /> Profile</Link>
           <Link to='/profiles' className='flex items-center link'><FaHeartCirclePlus className='-mt-1 mr-2' /> Swipe</Link>
           <Link to='/matches' className='flex items-center link'><FaEnvelopeOpenText className='-mt-1 mr-2' /> Matches</Link>
+          {user ? <button onClick={logout}>Logout</button> : ""}
         </ul>
       </nav>
       <button className="mobile-menu-button" onClick={toggleMobileMenu}>

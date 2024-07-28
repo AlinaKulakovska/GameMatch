@@ -6,6 +6,8 @@ import Profile from './pages/Profile';
 import Profiles from './pages/ProfilesPage';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MatchesPage from './pages/MatchesPage';
+import ProtectedRoute from './components/ProtectedRoute';
+
 function App() {
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>
@@ -13,7 +15,7 @@ function App() {
       <Header />
         <Routes>
           <Route path="/" element={<Landing />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<ProtectedRoute element={Profile} />} />
           <Route path="/profiles" element={<Profiles />} />
           <Route path="/matches" element={<MatchesPage />} />
         </Routes>
