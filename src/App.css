@@ -43,7 +43,14 @@ body{
   display: flex;
   gap: 20px;
 }
-
+.nav-links button{
+background-color: #fff;
+color: #282c34;
+}
+.nav-links button:hover{
+  background-color: #e73370;
+  color: #282c34;
+  }
 .link {
   color: white;
   text-decoration: none;

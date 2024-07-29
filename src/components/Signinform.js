@@ -10,7 +10,8 @@ const SignInForm = ({ isVisible, closeForm }) => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    const handleRegister = () => {
+    const handleRegister = async (e) => {
+        e.preventDefault();
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     // Signed up 

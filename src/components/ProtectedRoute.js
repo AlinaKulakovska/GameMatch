@@ -11,6 +11,7 @@ const ProtectedRoute = ({ element: Element, ...rest }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      alert('Please log in to access this page');
       setLoading(false);
     });
     return () => unsubscribe();
