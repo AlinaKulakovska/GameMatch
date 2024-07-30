@@ -1,27 +1,20 @@
 // src/components/ProtectedRoute.js
-import React, { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebaseConfig';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './/AuthContext';
 
-const ProtectedRoute = ({ element: Element, ...rest }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+const ProtectedRoute = ({ element: Component, ...rest }) => {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    if (!currentUser) {
       alert('Please log in to access this page');
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
+      navigate('/');
+    }
+  }, [currentUser, navigate]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  return user ? <Element {...rest} /> : <Navigate to="/" />;
+  return currentUser ? <Component {...rest} /> : null;
 };
 
 export default ProtectedRoute;

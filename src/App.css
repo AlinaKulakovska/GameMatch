@@ -523,7 +523,7 @@ margin-left: -1px;
 
 .profile-card {
   padding: 20px;
-  margin: 10px;
+  margin: 10px auto;
   background-color: #ffffff;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -565,7 +565,7 @@ margin-left: -1px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-left: 10px;
+    margin: 10px;
   }
   .dislike-button
   {
@@ -575,7 +575,7 @@ margin-left: -1px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    
+    margin: 10px;
   }
    .like-button:hover {
     background-color: #e73370;

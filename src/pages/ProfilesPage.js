@@ -1,87 +1,103 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { collection, getDocs, doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { db } from "../components/firebaseConfig";
+import { useAuth } from "../components/AuthContext";
+import Select from 'react-select';
 import { FaMapLocationDot } from 'react-icons/fa6';
 import { FaSuitcase } from 'react-icons/fa';
-import Select from 'react-select';
-
-const profilesData = [
-    {
-        name: 'Jane Doe',
-        age: 28,
-        job: 'Marketing',
-        location: 'Ukraine',
-        bio: 'Lover of adventure, food, and good company.',
-        interests: ['Hiking', 'Cooking', 'Traveling', 'Reading', 'Video games'],
-        profilePicture: 'https://via.placeholder.com/150',
-        games: ['Minecraft', 'Overwatch'],
-    },
-    {
-        name: 'John Smith',
-        age: 30,
-        job: 'Software Developer',
-        location: 'USA',
-        bio: 'Tech enthusiast and coffee lover.',
-        interests: ['Coding', 'Gaming', 'Reading', 'Traveling'],
-        profilePicture: 'https://via.placeholder.com/150',
-        games: ['Valorant', 'League of Legends'],
-    },
-    // Add more profiles as needed
-];
-
-
-const gameOptions = [
-    { value: 'Minecraft', label: 'Minecraft' },
-    { value: 'Overwatch', label: 'Overwatch' },
-    { value: 'Valorant', label: 'Valorant' },
-    { value: 'League of Legends', label: 'League of Legends' },
-    // Add more game options as needed
-];
-
-const locationOptions = [
-    { value: 'Ukraine', label: 'Ukraine' },
-    { value: 'USA', label: 'USA' },
-    // Add more location options as needed
-];
-
-
-
 
 const ProfilesPage = () => {
-    const [profiles, setProfiles] = useState(profilesData);
-    const [filteredProfiles, setFilteredProfiles] = useState(profilesData);
+    const { currentUser } = useAuth();
+    const [profiles, setProfiles] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [filteredProfiles, setFilteredProfiles] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [ageFilter, setAgeFilter] = useState('');
+    const [ageFilter, setAgeFilter] = useState(18);
     const [gameFilter, setGameFilter] = useState(null);
     const [locationFilter, setLocationFilter] = useState(null);
+    const [likedProfiles, setLikedProfiles] = useState([]);
+    
+    const gameOptions = [
+        { value: 'Minecraft', label: 'Minecraft' },
+        { value: 'Overwatch', label: 'Overwatch' },
+        { value: 'Valorant', label: 'Valorant' },
+        { value: 'League of Legends', label: 'League of Legends' },
+    ];
 
-    const filterProfiles = () => {
-        const filtered = profiles.filter(profile => {
+    const locationOptions = [
+        { value: 'Ukraine', label: 'Ukraine' },
+        { value: 'USA', label: 'USA' },
+    ];
+
+    useEffect(() => {
+        const fetchProfiles = async () => {
+            // Fetch all profiles
+            const querySnapshot = await getDocs(collection(db, "users"));
+            const profilesArray = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+            setProfiles(profilesArray);
+
+            // Fetch liked profiles for the current user
+            if (currentUser) {
+                const userDocRef = doc(db, "users", currentUser.uid);
+                const userDoc = await getDoc(userDocRef);
+                const liked = userDoc.data()?.liked || [];
+                setLikedProfiles(liked);
+            }
+
+            setLoading(false);
+        };
+        fetchProfiles();
+    }, [currentUser]);
+
+    useEffect(() => {
+        filterProfiles(profiles);
+    }, [profiles, ageFilter, gameFilter, locationFilter, likedProfiles]);
+
+    const filterProfiles = (profilesArray) => {
+        const filtered = profilesArray.filter(profile => {
+            const isCurrentUser = profile.id === currentUser.uid;
             const ageMatch = ageFilter ? profile.age >= parseInt(ageFilter) : true;
             const gameMatch = gameFilter ? profile.games.includes(gameFilter.value) : true;
             const locationMatch = locationFilter ? profile.location === locationFilter.value : true;
+            const notLiked = !likedProfiles.includes(profile.id); // Filter out liked profiles
 
-            return ageMatch && gameMatch && locationMatch;
+            return ageMatch && gameMatch && locationMatch && notLiked && !isCurrentUser;
         });
         setFilteredProfiles(filtered);
         setCurrentIndex(0);
     };
-// dislike
+
+    const handleLike = async (profileId) => {
+        if (currentUser) {
+            const userDocRef = doc(db, "users", currentUser.uid);
+            await updateDoc(userDocRef, {
+                liked: arrayUnion(profileId)
+            });
+        } else {
+            alert("You need to log in to like profiles.");
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
     const handleNextProfile = () => {
         if (currentIndex < filteredProfiles.length - 1) {
             setCurrentIndex(currentIndex + 1);
         }
     };
-// like
+
     const handlePrevProfile = () => {
         if (currentIndex < filteredProfiles.length - 1) {
             setCurrentIndex(currentIndex + 1);
-// add to likes database
         }
     };
 
     const currentProfile = filteredProfiles[currentIndex];
 
     return (
-        <div className="profiles-page">
+        <div>
             <div className="filters">
                 <div className="filter">
                     <label>Age</label>
@@ -112,35 +128,38 @@ const ProfilesPage = () => {
                         placeholder="Select location"
                     />
                 </div>
-                <button onClick={filterProfiles} className="filter-button">Filter</button>
+
+                <button onClick={() => filterProfiles(profiles)} className="filter-button">Filter</button>
             </div>
-            {filteredProfiles.length > 0 ? (
-                <div className="profile-card">
-                    <img src={currentProfile.profilePicture} alt="Profile" className="profile-picture" />
-                    <h2>{currentProfile.name}, {currentProfile.age}</h2>
-                    <h6 className='mb-2 flex justify-center items-center'><FaSuitcase className='mr-2' /> {currentProfile.job}</h6>
-                    <p><strong>Bio:</strong> {currentProfile.bio}</p>
-                    <h3>Interests</h3>
-                    <ul>
-                        {currentProfile.interests.map((interest, index) => (
-                            <li key={index}>{interest}</li>
-                        ))}
-                    </ul>
-                    <h3>Games</h3>
-                    <ul>
-                        {currentProfile.games.map((game, index) => (
-                            <li key={index}>{game}</li>
-                        ))}
-                    </ul>
-                    <h6 className='mb-2 flex justify-center items-center'><FaMapLocationDot className='mr-2' /> {currentProfile.location}</h6>
-                    <div className="buttons">
-                        <button onClick={handleNextProfile} disabled={currentIndex === filteredProfiles.length - 1} className="dislike-button">Dislike</button>
-                        <button onClick={handlePrevProfile} disabled={currentIndex === filteredProfiles.length - 1} className="like-button">Like</button>
+            <div className="m-20">
+                {filteredProfiles.length > 0 ? (
+                    <div key={currentProfile.id} className="profile-card">
+                        <img src={currentProfile.profilePicture} alt={currentProfile.name} className="profile-picture" />
+                        <h2>{currentProfile.name}, {currentProfile.age}</h2>
+                        <h6 className='mb-2 flex justify-center items-center'><FaSuitcase className='mr-2' /> {currentProfile.job}</h6>
+                        <p><strong>Bio:</strong> {currentProfile.bio}</p>
+                        <h3>Interests</h3>
+                        <ul>
+                            {currentProfile.interests.map((interest, index) => (
+                                <li key={index}>{interest}</li>
+                            ))}
+                        </ul>
+                        <h3>Games</h3>
+                        <ul>
+                            {currentProfile.games.map((game, index) => (
+                                <li key={index}>{game}</li>
+                            ))}
+                        </ul>
+                        <h6 className='mb-2 flex justify-center items-center'><FaMapLocationDot className='mr-2' /> {currentProfile.location}</h6>
+                        <div className="buttons">
+                            <button onClick={handlePrevProfile} className="dislike-button" disabled={currentIndex === filteredProfiles.length}>Dislike</button>
+                            <button onClick={() => { handleLike(currentProfile.id); handleNextProfile(); }} disabled={currentIndex === filteredProfiles.length } className="like-button">Like</button>
+                        </div>
                     </div>
-                </div>
-            ) : (
-                <p>No profiles match the filters</p>
-            )}
+                ) : (
+                    <p className="text-center">No profiles match the filters</p>
+                )}
+            </div>
         </div>
     );
 };

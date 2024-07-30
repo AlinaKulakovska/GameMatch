@@ -16,7 +16,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/profile" element={<ProtectedRoute element={Profile} />} />
-          <Route path="/profiles" element={<Profiles />} />
+          <Route path="/profiles" element={<ProtectedRoute element={Profiles} />} />
           <Route path="/matches" element={<MatchesPage />} />
         </Routes>
       <Footer />

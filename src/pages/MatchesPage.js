@@ -1,55 +1,97 @@
-import React, { useState } from 'react';
-
-const matchedProfilesData = [
-  {
-    id: 1,
-    name: 'Jane Doe',
-    age: 28,
-    job: 'Marketing',
-    location: 'Ukraine',
-    bio: 'Lover of adventure, food, and good company.',
-    interests: ['Hiking', 'Cooking', 'Traveling', 'Reading', 'Video games'],
-    profilePicture: 'https://via.placeholder.com/150',
-    games: ['Minecraft', 'Overwatch'],
-    messages: [],
-  },
-  {
-    id: 2,
-    name: 'John Smith',
-    age: 30,
-    job: 'Software Developer',
-    location: 'USA',
-    bio: 'Tech enthusiast and coffee lover.',
-    interests: ['Coding', 'Gaming', 'Reading', 'Traveling'],
-    profilePicture: 'https://via.placeholder.com/150',
-    games: ['Valorant', 'League of Legends'],
-    messages: [],
-  },
-  // Add more matched profiles as needed
-];
+import React, { useEffect, useState } from 'react';
+import { collection, getDocs, doc, getDoc, updateDoc, setDoc, query, where, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../components/firebaseConfig'; // Adjust import path as needed
 
 const MatchesPage = () => {
-  const [matchedProfiles, setMatchedProfiles] = useState(matchedProfilesData);
+  const [matchedProfiles, setMatchedProfiles] = useState([]);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [message, setMessage] = useState('');
+  const [currentUserUid, setCurrentUserUid] = useState(null);
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    // Fetch current user UID from Firebase Authentication
+    const user = auth.currentUser;
+    if (user) {
+      setCurrentUserUid(user.uid);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!currentUserUid) return;
+
+    const fetchMatchedProfiles = async () => {
+      try {
+        // Fetch current user liked profiles
+        const currentUserDocRef = doc(db, 'users', currentUserUid);
+        const currentUserDoc = await getDoc(currentUserDocRef);
+        const currentUserData = currentUserDoc.data();
+        const likedProfiles = currentUserData?.liked || [];
+
+        // Fetch all users
+        const querySnapshot = await getDocs(collection(db, 'users'));
+        const allProfiles = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+
+        // Find mutual matches
+        const mutualMatches = allProfiles.filter(profile => 
+          likedProfiles.includes(profile.id) &&
+          (profile.liked || []).includes(currentUserUid)
+        );
+
+        setMatchedProfiles(mutualMatches);
+      } catch (error) {
+        console.error('Error fetching matched profiles:', error);
+      }
+    };
+
+    fetchMatchedProfiles();
+  }, [currentUserUid]);
+
+  useEffect(() => {
+    if (!selectedProfileId || !currentUserUid) return;
+
+    // Set up real-time listener for messages
+    const conversationId = [currentUserUid, selectedProfileId].sort().join('_');
+    const messagesRef = doc(db, 'messages', conversationId);
+
+    const unsubscribe = onSnapshot(messagesRef, (doc) => {
+      const data = doc.data();
+      if (data) {
+        setMessages(data.messages || []);
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup on unmount
+  }, [selectedProfileId, currentUserUid]);
 
   const handleProfileClick = (profileId) => {
     setSelectedProfileId(profileId);
   };
 
-  const handleSendMessage = () => {
-    const updatedProfiles = matchedProfiles.map(profile => {
-      if (profile.id === selectedProfileId) {
-        return {
-          ...profile,
-          messages: [...profile.messages, { text: message, sender: 'me' }]
-        };
-      }
-      return profile;
-    });
+  const handleSendMessage = async () => {
+    if (!selectedProfileId || !message.trim() || !currentUserUid) return;
 
-    setMatchedProfiles(updatedProfiles);
-    setMessage('');
+    try {
+      const messageObj = { text: message, sender: currentUserUid, timestamp: new Date() };
+
+      // Create a unique conversation ID based on both participants' IDs
+      const conversationId = [currentUserUid, selectedProfileId].sort().join('_');
+      const messagesDocRef = doc(db, 'messages', conversationId);
+
+      // Fetch the current messages for this conversation
+      const messagesDoc = await getDoc(messagesDocRef);
+      const currentMessages = messagesDoc.exists() ? messagesDoc.data().messages || [] : [];
+
+      // Update the messages in Firestore
+      await setDoc(messagesDocRef, {
+        participants: [currentUserUid, selectedProfileId],
+        messages: [...currentMessages, messageObj],
+      }, { merge: true });
+
+      setMessage('');
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   };
 
   const selectedProfile = matchedProfiles.find(profile => profile.id === selectedProfileId);
@@ -73,8 +115,8 @@ const MatchesPage = () => {
               <h2>{selectedProfile.name}</h2>
             </div>
             <div className="messages">
-              {selectedProfile.messages.map((msg, index) => (
-                <div key={index} className={`message ${msg.sender}`}>
+              {messages.map((msg, index) => (
+                <div key={index} className={`message ${msg.sender === currentUserUid ? 'me' : 'other'}`}>
                   {msg.text}
                 </div>
               ))}
