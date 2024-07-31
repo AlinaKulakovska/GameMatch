@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/GameMatch/static/css/main.da78e905.css",
+    "main.js": "/GameMatch/static/js/main.4ebb0184.js",
+    "static/js/453.2dca4a7c.chunk.js": "/GameMatch/static/js/453.2dca4a7c.chunk.js",
+    "static/media/hero.png": "/GameMatch/static/media/hero.8c3ea7859500ff80aff0.png",
+    "static/media/logo.png": "/GameMatch/static/media/logo.82e53d1adfc5be03705c.png",
+    "index.html": "/GameMatch/index.html",
+    "main.da78e905.css.map": "/GameMatch/static/css/main.da78e905.css.map",
+    "main.4ebb0184.js.map": "/GameMatch/static/js/main.4ebb0184.js.map",
+    "453.2dca4a7c.chunk.js.map": "/GameMatch/static/js/453.2dca4a7c.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.da78e905.css",
+    "static/js/main.4ebb0184.js"
+  ]
+}
