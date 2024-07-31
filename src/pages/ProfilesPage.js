@@ -14,7 +14,6 @@ const ProfilesPage = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [ageFilter, setAgeFilter] = useState(18);
     const [gameFilter, setGameFilter] = useState(null);
-    const [locationFilter, setLocationFilter] = useState(null);
     const [likedProfiles, setLikedProfiles] = useState([]);
     
     const gameOptions = [
@@ -22,11 +21,6 @@ const ProfilesPage = () => {
         { value: 'Overwatch', label: 'Overwatch' },
         { value: 'Valorant', label: 'Valorant' },
         { value: 'League of Legends', label: 'League of Legends' },
-    ];
-
-    const locationOptions = [
-        { value: 'Ukraine', label: 'Ukraine' },
-        { value: 'USA', label: 'USA' },
     ];
 
     useEffect(() => {
@@ -51,17 +45,16 @@ const ProfilesPage = () => {
 
     useEffect(() => {
         filterProfiles(profiles);
-    }, [profiles, ageFilter, gameFilter, locationFilter, likedProfiles]);
+    }, [profiles, ageFilter, gameFilter, likedProfiles]);
 
     const filterProfiles = (profilesArray) => {
         const filtered = profilesArray.filter(profile => {
             const isCurrentUser = profile.id === currentUser.uid;
             const ageMatch = ageFilter ? profile.age >= parseInt(ageFilter) : true;
             const gameMatch = gameFilter ? profile.games.includes(gameFilter.value) : true;
-            const locationMatch = locationFilter ? profile.location === locationFilter.value : true;
             const notLiked = !likedProfiles.includes(profile.id); // Filter out liked profiles
 
-            return ageMatch && gameMatch && locationMatch && notLiked && !isCurrentUser;
+            return ageMatch && gameMatch && notLiked && !isCurrentUser;
         });
         setFilteredProfiles(filtered);
         setCurrentIndex(0);
@@ -119,16 +112,6 @@ const ProfilesPage = () => {
                         placeholder="Select game"
                     />
                 </div>
-                <div className="filter">
-                    <label>Location</label>
-                    <Select
-                        options={locationOptions}
-                        value={locationFilter}
-                        onChange={setLocationFilter}
-                        placeholder="Select location"
-                    />
-                </div>
-
                 <button onClick={() => filterProfiles(profiles)} className="filter-button">Filter</button>
             </div>
             <div className="m-20">

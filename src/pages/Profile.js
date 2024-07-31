@@ -3,10 +3,10 @@ import { FaMapLocationDot } from 'react-icons/fa6';
 import Select from 'react-select';
 
 import React, { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../components/firebaseConfig";
+import { onAuthStateChanged, deleteUser } from "firebase/auth";
+import { auth, db } from "../components/firebaseConfig"; // Ensure you have firestore imported here
 import { getUserProfile, updateUserProfile } from "../components/getdata";
-
+import { doc, deleteDoc } from "firebase/firestore"; // Ensure you have firestore functions imported
 const Profile = () => {
     // transfer to databse
     const gamesOptions = [
@@ -91,6 +91,20 @@ const Profile = () => {
         }
     };
 
+    const handleDeleteAccount = async () => {
+        if (user) {
+            const userDocRef = doc(db, 'users', user.uid);
+            try {
+                await deleteDoc(userDocRef); // Delete user data from Firestore
+                await deleteUser(user); // Delete user from Firebase Authentication
+                alert("Account deleted successfully");
+            } catch (error) {
+                console.error("Error deleting account: ", error);
+                alert("Failed to delete account. Please try again.");
+            }
+        }
+    };
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -170,80 +184,11 @@ const Profile = () => {
                    <h6 className='mb-2 flex justify-center items-center'><FaMapLocationDot className='mr-2' /> {profileData.location || "Not set"}</h6>
                </div>
                     <button onClick={() => setEditing(true)}>Edit</button>
+                    <button onClick={handleDeleteAccount} className='mt-5 delete-btn'>Delete Account</button>
                 </div>
             )}
         </div>
     );
 };
-
-//     return (
-//         <div className="profile-page my-10">
-//             <div className="profile-header">
-//                 <img src={user.profilePicture} alt="Profile" className="profile-picture" />
-//                 <button className="edit-button" onClick={handleEditClick}>Edit Profile</button>
-//             </div>
-//             {isEditing ? (
-//                 <div className="profile-form">
-//                     <label>
-//                         Name:
-//                         <input type="text" name="name" value={editedUser.name} onChange={handleChange} />
-//                     </label>
-//                     <label>
-//                         Age:
-//                         <input type="number" name="age" value={editedUser.age} onChange={handleChange} />
-//                     </label>
-//                     <label>
-//                         Job:
-//                         <input type="text" name="job" value={editedUser.job} onChange={handleChange} />
-//                     </label>
-//                     <label>
-//                         Location:
-//                         <input type="text" name="job" value={editedUser.location} onChange={handleChange} />
-//                     </label>
-//                     <label>
-//                         Bio:
-//                         <textarea name="bio" value={editedUser.bio} onChange={handleChange} />
-//                     </label>
-//                     <label>
-//                         Interests:
-//                         <input type="text" name="interests" value={editedUser.interests.join(', ')} onChange={handleChange} />
-//                     </label>
-//                     <label>
-//                         Games:
-//                         <Select
-//                             isMulti
-//                             name="games"
-//                             options={gamesOptions}
-//                             className="basic-multi-select"
-//                             classNamePrefix="select"
-//                             value={gamesOptions.filter(option => editedUser.games.includes(option.value))}
-//                             onChange={handleGamesChange}
-//                         />
-//                     </label>
-//                     <button className="save-button" onClick={handleSaveClick}>Save</button>
-//                 </div>
-//             ) : (
-//                 <div className="profile-info">
-//                     <h2><b>{user.name}, {user.age}</b></h2>
-//                     <h6 className='mb-2 flex justify-center items-center'><FaSuitcase className='mr-2' /> {user.job}</h6>
-//                     <p>{user.bio}</p>
-//                     <h3>Interests</h3>
-//                     <ul>
-//                         {user.interests.map((interest, index) => (
-//                             <li key={index}>{interest}</li>
-//                         ))}
-//                     </ul>
-//                     <h3>Games</h3>
-//                     <ul>
-//                         {user.games.map((game, index) => (
-//                             <li key={index}>{game}</li>
-//                         ))}
-//                     </ul>
-//                     <h6 className='mb-2 flex justify-center items-center'><FaMapLocationDot className='mr-2' /> {user.location}</h6>
-//                 </div>
-//             )}
-//         </div>
-//     );
-// };
 
 export default Profile;
