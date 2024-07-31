@@ -648,17 +648,21 @@ margin-left: -1px;
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 5px;
-    max-width: 60%;
+    display: flex;
   }
   
   .message.me {
     background-color: #e1ffc7;
-    align-self: flex-end;
+    justify-content: end;
+  width: 60%;
+    margin-left: 40%;
+    right: 0;
   }
   
   .message.other {
     background-color: #f0f0f0;
-    align-self: flex-start;
+    justify-content: start;
+   width: 60%;
   }
   
   .message-input {

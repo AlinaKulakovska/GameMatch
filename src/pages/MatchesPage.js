@@ -37,7 +37,6 @@ const MatchesPage = () => {
           likedProfiles.includes(profile.id) &&
           (profile.liked || []).includes(currentUserUid)
         );
-
         setMatchedProfiles(mutualMatches);
       } catch (error) {
         console.error('Error fetching matched profiles:', error);
@@ -59,6 +58,8 @@ const MatchesPage = () => {
       if (data) {
         setMessages(data.messages || []);
       }
+    }, (error) => {
+      console.error('Error listening for messages:', error);
     });
 
     return () => unsubscribe(); // Cleanup on unmount
